@@ -1,0 +1,50 @@
+---
+css: rmdstyles.css
+---
+
+**overview**
+
+Partial Reference Free deconvolution methods use cell-type specific marker genes.
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-0lax">Method</th>
+    <th class="tg-0lax">Property</th>
+    <th class="tg-0lax">Year</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-0lax">DSA</td>
+    <td class="tg-0lax">Digital Sorting Algorithm</td>
+    <td class="tg-0lax">2013</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">ssFrobenius</td>
+    <td class="tg-0lax">Semi-supervised NMF for Euclidean distance</td>
+    <td class="tg-0lax">2011</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">ssKL</td>
+    <td class="tg-0lax">Semi-supervised NMF for KL divergence</td>
+    <td class="tg-0lax">2011</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">Q Prog</td>
+    <td class="tg-0lax">Q programming</td>
+    <td class="tg-0lax">2011</td>
+  </tr>
+</tbody>
+</table>
+
+
+

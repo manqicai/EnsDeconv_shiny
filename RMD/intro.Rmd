@@ -1,0 +1,14 @@
+---
+css: rmdstyles.css
+---
+
+
+
+
+**Cell Type Deconvolutin methods**
+
+
+Cell type fractions have been shown useful in many genomics analyses. Traditional methods for determining cell-type fractions like immunohistochemistry and flow cytometry remain costly compared to computational approaches using bulk RNA-seq data. Many computational methods, which are called cell type deconvolution, have been proposed to infer cell-type fractions from bulk transcriptomics data. However, these methods produce very different results under different settings. 
+
+---
+

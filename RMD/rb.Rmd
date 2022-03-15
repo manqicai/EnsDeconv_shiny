@@ -1,0 +1,86 @@
+---
+css: rmdstyles.css
+---
+
+**overview**
+
+Reference Based deconvolution methods use reference data (& marker genes).
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-0lax">Method</th>
+    <th class="tg-0lax">Property</th>
+    <th class="tg-0lax">Year</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-0lax">hspe</td>
+    <td class="tg-0lax">Hybrid-scale proportions estimation</td>
+    <td class="tg-0lax">2021</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">ICeDT</td>
+    <td class="tg-0lax">Log-normal model based method</td>
+    <td class="tg-0lax">2021</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">DeconRNASeq</td>
+    <td class="tg-0lax">Global optimization through quadratic programming</td>
+    <td class="tg-0lax">2021</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">GEDIT</td>
+    <td class="tg-0lax">Row scaling and NNLS</td>
+    <td class="tg-0lax">2021</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">BisqueRNA</td>
+    <td class="tg-0lax">NNLS; Transformation of bulk samples</td>
+    <td class="tg-0lax">2020</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">BayesPrism</td>
+    <td class="tg-0lax">Bayesian cell-type deconvolution </td>
+    <td class="tg-0lax">2020</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">FARDEEP</td>
+    <td class="tg-0lax">Adaptive least trimmed square with NNLS</td>
+    <td class="tg-0lax">2019</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">dtangle</td>
+    <td class="tg-0lax">Linear mixing model for log transformed data</td>
+    <td class="tg-0lax">2019</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">MuSiC</td>
+    <td class="tg-0lax">Weighted-NNLS</td>
+    <td class="tg-0lax">2019</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">CIBERSORT</td>
+    <td class="tg-0lax">SVM-regression</td>
+    <td class="tg-0lax">2018</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">EPIC</td>
+    <td class="tg-0lax">TPM normalized LS</td>
+    <td class="tg-0lax">2017</td>
+  </tr>
+</tbody>
+</table>
+
+
+
+
