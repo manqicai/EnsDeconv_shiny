@@ -22,6 +22,8 @@ library(EnsDeconv)
 library(sparseMatrixStats)
 #library(scran)
 library(ggpubr)
+library(writexl)
+library(DeconRNASeq)
 
 
 
@@ -115,6 +117,11 @@ shinyServer(function(input, output,session){
      # }
       
      bat <- ifelse(input$batchcorrec == "Yes",TRUE,FALSE)
+     
+     refname <- input$columnsref
+     colnames(metaref)[which(colnames(metaref) == refname)] = "deconv_clust" 
+     refname <- input$columnssample
+     colnames(metaref)[which(colnames(metaref) == input$refname)] = "SamplesNames" 
      
      
      ref_list = list()
