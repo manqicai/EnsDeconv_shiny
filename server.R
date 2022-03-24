@@ -193,40 +193,23 @@ shinyServer(function(input, output,session){
 
 
    })
-   # observe({             
-   #   
-   #   for (i in 1:length(dcInput())) {
-   #     local({ 
-   #       
-   #       
-   #       plotname <- paste("plot", i, sep="")
-   #       my_i <- i
-   #       plotname <- names(dcInput())[[my_i]]
-   #       output[[plotname]] <- renderPlot({
-   #         
-   #         #function_plot is the function generate plot
-   #         #pheatmap( dcInput()[[my_i]], display_numbers = T,main = plotname)
-   #          boxplot(dcInput()[[my_i]], main = plotname)
-   #         
-   #       })
-   #     })#endlocal
-   #   }
-   #   
-   # })
+
 
    # Downloadable csv of selected dataset ----
    output$downloadData <- downloadHandler(
      filename = function() {
-       "outcome.csv"
+       "outcome.RData"
         
      },
      content = function(file) {
         resout = dcInput()
         resout = lapply(resout, as.data.frame)
         resout <- lapply(resout, function(x) rownames_to_column(x, "sample"))
-        write_xlsx(resout, file)
+        save(resout, file = file)
      }
    )
+   
+   
    
    data <- reactive({
       req(input$metabulk)
