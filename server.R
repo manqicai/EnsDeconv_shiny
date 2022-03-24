@@ -5,7 +5,7 @@
 #
 #    http://shiny.rstudio.com/
 #
-#options(shiny.maxRequestSize=50000*1024^2)
+options(shiny.maxRequestSize=50000*1024^2)
 
 #library(BiocManager)
 #options(repos = BiocManager::repositories())
@@ -218,6 +218,7 @@ shinyServer(function(input, output,session){
    output$downloadData <- downloadHandler(
      filename = function() {
        "outcome.csv"
+        
      },
      content = function(file) {
         resout = dcInput()
