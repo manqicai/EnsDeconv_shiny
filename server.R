@@ -121,7 +121,7 @@ shinyServer(function(input, output,session){
      refname <- input$columnsref
      colnames(metaref)[which(colnames(metaref) == refname)] = "deconv_clust" 
      refname <- input$columnssample
-     colnames(metaref)[which(colnames(metaref) == input$refname)] = "SamplesNames" 
+     colnames(metaref)[which(colnames(metaref) == refname)] = "SamplesNames" 
      
      
      ref_list = list()
