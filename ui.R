@@ -8,18 +8,7 @@
 #
 
 ########Library Packages#
-library(shiny)
-library(markdown)
-library(knitr)
-library(shinythemes)
-library(shinycustomloader)
-library(shinyhelper)
-library(dplyr)
-library(formattable)
-library(tidyverse)
-library(shinysky)
-library(shinycssloaders)
-library(shinyWidgets)
+
 #options(repos = BiocManager::repositories())
 #source file
 # source("methods/Deconv_meth_helper.R")
@@ -27,7 +16,24 @@ library(shinyWidgets)
 # source("methods/my_music_construct.R")
 # source("methods/my_music_utils.R")
 
-
+library(knitr)
+library(markdown)
+library(shiny)
+library(shinythemes)
+library(shinycustomloader)
+library(shinyhelper)
+library(foreach)
+library(tidyverse)
+library(EnsDeconv)
+library(sparseMatrixStats)
+#library(scran)
+library(ggpubr)
+library(DeconRNASeq)
+library(dplyr)
+library(formattable)
+library(shinysky)
+library(shinycssloaders)
+library(shinyWidgets)
 
 
 
@@ -48,7 +54,7 @@ appCSS <- "
 
 
 
-navbarPage(title = div("Ensemble Cell Type Deconvolution",tagList(a(href = "https://publichealth.pitt.edu/biostatistics/", style = "color:#606060", tags$img(src='University_of_Pittsburgh_Logo_CMYK_Primary_3-Color.png',height = 30,width =60)))),
+navbarPage(title = div("EnsDeconv (Ensemble Deconvolution)",tagList(a(href = "https://publichealth.pitt.edu/biostatistics/", style = "color:#606060", tags$img(src='University_of_Pittsburgh_Logo_CMYK_Primary_3-Color.png',height = 30,width =60)))),
 
           theme = shinytheme("yeti"),
            fluid = TRUE,
@@ -91,21 +97,15 @@ navbarPage(title = div("Ensemble Cell Type Deconvolution",tagList(a(href = "http
 				hr(),
 				helpText(strong("- Analysis -" , style="color:green ; font-family: 'times'; font-size:20pt ; font-type:bold" ) ) ,
 				helpText(HTML("<a onclick=","customHref('dc')" ,">",
-				              "Analysis","</a>")),
-				hr(),
-				helpText(strong("- Data Availability -" , style="color:green ; font-family: 'times'; font-size:20pt ; font-type:bold" ) ) ,
-				
-				helpText(HTML("<a onclick=","customHref('rf')" ,">",
+				              "General analysis","</a>")),
+				helpText(HTML("<a onclick=","customHref('braindc')" ,">",
 				              "Brain Data","</a>")),
-				helpText(HTML("<a onclick=","customHref('prf')" ,">",
+				helpText(HTML("<a onclick=","customHref('blooddc')" ,">",
 				              "Blood Data","</a>")),
 	
 				hr(),
 				p("We summarized following methods:"),
 				helpText(strong("- Deconvolution Method -" , style="color:green ; font-family: 'times'; font-size:20pt ; font-type:bold" ) ) ,
-
-				helpText(HTML("<a onclick=","customHref('rf')" ,">",
-                                  "Reference Free Method","</a>")),
 				helpText(HTML("<a onclick=","customHref('prf')" ,">",
                         "Partial Reference Free Method","</a>")),
 				helpText(HTML("<a onclick=","customHref('rb')" ,">",
@@ -119,16 +119,18 @@ navbarPage(title = div("Ensemble Cell Type Deconvolution",tagList(a(href = "http
 			         helpText(strong("Get Started" , style="color:green ; font-family: 'times'; font-size:20pt ; font-type:bold" ) ),
 			         includeMarkdown("RMD/gs.Rmd")
 			),
-			tabPanel("Analysis",
+			navbarMenu("Analysis",
+			           tabPanel("General analysis",
 			                    value = "dc",
-			                    helpText(strong("Analysis" , style="color:green ; font-family: 'times'; font-size:20pt ; font-type:bold" ) ),
+			                    helpText(strong("General analysis" , style="color:green ; font-family: 'times'; font-size:20pt ; font-type:bold" ) ),
 			                    sidebarPanel(strong("Required"),
 			                                 fluidRow(column(width = 3,fileInput("bulk", label = h4("Bulk Data"),
 			                                                                     accept = c("text/csv",
 			                                                                                "text/comma-separated-values,text/plain",
 			                                                                                ".csv",
 			                                                                                ".rds",
-			                                                                                ".RData"))
+			                                                                                ".RData",
+			                                                                                ".txt"))
 			                                                 %>%
 			                                                   helper(colour = "green",type = "inline", content = "Upload the file of bulk data you want to deconvolve (.csv, .rds or .RData),rows are genes and columns are samples")),
 			                                          column(width = 3,fileInput("ref", label = h4("Ref Data"),
@@ -136,25 +138,27 @@ navbarPage(title = div("Ensemble Cell Type Deconvolution",tagList(a(href = "http
 			                                                                                "text/comma-separated-values,text/plain",
 			                                                                                ".csv",
 			                                                                                ".rds",
-			                                                                                ".RData"))%>%
+			                                                                                ".RData",
+			                                                                                ".txt"))%>%
 			                                                   helper(colour = "green",type = "inline",size = "m",content = "Upload the file of reference data (.csv, .rds or .RData),rows are genes and columns are samples")),
 			                                          column(width = 6,fileInput("metaref", label = h4("Meta data of Ref Data"),
 			                                                                     accept = c("text/csv",
 			                                                                                "text/comma-separated-values,text/plain",
 			                                                                                ".csv",
 			                                                                                ".rds",
-			                                                                                ".RData"))%>%
+			                                                                                ".RData",
+			                                                                                ".txt"))%>%
 			                                                   helper(colour = "green",type = "inline",size = "m",content = "Upload the file of meta data for the reference data (.csv, .rds or .RData)")))
 			                                 ,fluidRow(column(width = 6, selectInput("columnsref", h4("Select cluster variable"), choices = NULL)%>% helper(colour = "green",type = "inline", content = "Select the variable that correspond to cell type cluster")),
 			                                           column(width = 6,selectInput("columnssample", h4("Select sample ID variable"), choices = NULL)%>% helper(colour = "green",type = "inline", content = "Select the variable that correspond to sample ID")))
 			                                 
 			                                 #actionButton("updateref", "incorporate external information", class = "btn-info"),
 			                                ,fluidRow(column(width = 6, multiInput("Deconv", label = h4("Deconvolution Method"),
-			                                                                       choices = list("dtangle", "hspe","deconf","ssFrobenius","ssKL","DSA","Q Prog","LS Fit","CIBERSORT","logRegression","linearRegression","EPIC","TOASTP","MuSiC","Bisque","GEDIT", "ICeDT","DeconRNASeq", "BayesPrism"),
+			                                                                       choices = list("dtangle", "hspe","DSA","CIBERSORT","EPIC","MuSiC","Bisque", "ICeDT","DeconRNASeq"),
 			                                                                       selected = c("Bisque","CIBERSORT"))
 			                                                 %>% helper(colour = "green",type = "inline", content = "Select the deconvolution methods that you want to apply")),
 			                                          column(width = 6,  multiInput("mrk", label = h4("Marker Gene Approach"),
-			                                                                        choices = list("none" , "TOAST" , "t","wilcox","combined","p.value","COSG"),
+			                                                                        choices = list("none"  , "t","wilcox","combined","p.value"),
 			                                                                        selected = "none")
 			                                                 %>% helper(colour = "green",type = "inline", content = "Choose the marker gene selection methods that you want to apply"))),
 			                                 
@@ -183,12 +187,6 @@ navbarPage(title = div("Ensemble Cell Type Deconvolution",tagList(a(href = "http
 			                                                                                 selected = "none")%>%
 			                                                  helper(colour = "green",type = "inline",size = "m",content = "Choose the Normalization approach of bulk & reference data")))
 			                                 ,
-			                                 switchInput(
-			                                   inputId = "batchcorrec",
-			                                   label = "Batch Correction",
-			                                   onLabel = "Yes",
-			                                   offLabel = "No")%>%
-			                                 helper(colour = "green",type = "inline",size = "m",content = "Choose whether perform batch correction or not"),
 			                                 actionButton("dcupdate", "Run", class = "btn-info"),
 			                                 downloadButton("downloadData", "Download results"),
 			                                 hr(),
@@ -225,14 +223,13 @@ navbarPage(title = div("Ensemble Cell Type Deconvolution",tagList(a(href = "http
 			                              
 			                    )
 			           ),
-			navbarMenu("Data Availability",
 			           tabPanel("Brain Data",
-			                    value = "brain",
+			                    value = "braindc",
 			                    helpText(strong("Brain Data" , style="color:green ; font-family: 'times'; font-size:20pt ; font-type:bold" ) ),
 			                    strong("References"),
 			           ),
 			           tabPanel("Blood Data",
-			                    value = "blood",
+			                    value = "blooddc",
 			                    helpText(strong("Blood Data" , style="color:green ; font-family: 'times'; font-size:20pt ; font-type:bold" ) ),
 			                    strong("References")
 			           )

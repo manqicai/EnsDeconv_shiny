@@ -10,20 +10,24 @@ options(shiny.maxRequestSize=50000*1024^2)
 #library(BiocManager)
 #options(repos = BiocManager::repositories())
 ########Library Packages
-library(shiny)
-library(markdown)
-library(knitr)
-library(shinythemes)
-library(shinycustomloader)
-library(shinyhelper)
-library(foreach)
-library(tidyverse)
-library(EnsDeconv)
-library(sparseMatrixStats)
-#library(scran)
-library(ggpubr)
-library(writexl)
-library(DeconRNASeq)
+# library(knitr)
+# library(markdown)
+# library(shiny)
+# library(shinythemes)
+# library(shinycustomloader)
+# library(shinyhelper)
+# library(foreach)
+# library(tidyverse)
+# library(EnsDeconv)
+# library(sparseMatrixStats)
+# #library(scran)
+# library(ggpubr)
+# library(DeconRNASeq)
+# library(dplyr)
+# library(formattable)
+# library(shinysky)
+# library(shinycssloaders)
+# library(shinyWidgets)
 
 
 
@@ -58,7 +62,7 @@ shinyServer(function(input, output,session){
       updateSelectInput(session, "columnsref", choices=colnames(refdata()))
       updateSelectInput(session, "columnssample", choices=colnames(refdata()))
    })
-
+   
 
 ###############CRM output################
 #########################################
@@ -76,15 +80,16 @@ shinyServer(function(input, output,session){
      }else if(str_detect(input$bulk$datapath,"RData")){
         load(input$bulk$datapath)
      }
+     metaref <- refdata() 
      # load meta ref
-     if(str_detect(input$metaref$datapath,"csv")){
-        metaref <- read.csv(input$metaref$datapath,
-                              header = TRUE)
-     }else if(str_detect(input$metaref$datapath,"rds")){
-        metaref <- readRDS(input$metaref$datapath)
-     }else if(str_detect(input$metaref$datapath,"RData")){
-        metaref <- load(input$metaref$datapath)
-     }
+     # if(str_detect(input$metaref$datapath,"csv")){
+     #    metaref <- read.csv(input$metaref$datapath,
+     #                          header = TRUE)
+     # }else if(str_detect(input$metaref$datapath,"rds")){
+     #    metaref <- readRDS(input$metaref$datapath)
+     # }else if(str_detect(input$metaref$datapath,"RData")){
+     #    metaref <- load(input$metaref$datapath)
+     # }
      # load reference data
      if(str_detect(input$ref$datapath,"csv")){
         ref <- read.csv(input$ref$datapath,
@@ -143,27 +148,6 @@ shinyServer(function(input, output,session){
      res_p
      })
 
-
-   # output$dctable <- renderTable({
-   #    dcInput()}, rownames = TRUE,colnames = T)
-   
-   # output$dcplots <- renderPlot({
-   #    res<- dcInput()
-   #    
-   #    
-   #    # Basic piechart
-   #    # ggplot(res[[1]], aes(x="", y=prop, fill=group)) +
-   #    #   geom_bar(stat="identity", width=1, color="white") +
-   #    #   coord_polar("y", start=0) +
-   #    #   theme_void() + 
-   #    #   theme(legend.position="none") +
-   #    #   
-   #    #   geom_text(aes(y = ypos, label = group), color = "white", size=6) +
-   #    #   scale_fill_brewer(palette="Set1")
-   #    
-   #    pheatmap(res[[1]], display_numbers = T)
-   #    
-   #   })
    
    output$plots <- renderPlot({
     
