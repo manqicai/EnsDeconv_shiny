@@ -57,8 +57,8 @@ shinyServer(function(input, output,session){
                                 header = TRUE)
          }else if(str_detect(input$metaref$datapath,"rds")){
             metaref <- readRDS(input$metaref$datapath)
-         }else if(str_detect(input$metaref$datapath,"RData")){
-            metaref <- load(input$metaref$datapath)
+         }else if(str_detect(input$metaref$datapath,"txt")){
+            metaref <-  read.delim(input$metaref$datapath)
          }
       })
       
@@ -83,27 +83,55 @@ shinyServer(function(input, output,session){
      if(str_detect(input$bulk$datapath,"csv")){
         to_deconv <- read.csv(input$bulk$datapath,
                               header = TRUE)
+        if(sum(sapply(to_deconv, is.numeric)) != ncol(to_deconv)){
+           to_deconv <- to_deconv[!duplicated(to_deconv[,1]), ]
+           bulkgene <-  to_deconv[,1]
+           to_deconv <- as.matrix(to_deconv[,-1])
+           rownames(to_deconv) <- bulkgene
+           rm(bulkgene)
+        }
      }else if(str_detect(input$bulk$datapath,"rds")){
         to_deconv <-readRDS(input$bulk$datapath)
-     }else if(str_detect(input$bulk$datapath,"RData")){
-        load(input$bulk$datapath)
+     }else if(str_detect(input$bulk$datapath,"txt")){
+        to_deconv <-  read.delim(input$bulk$datapath)
+        if(sum(sapply(to_deconv, is.numeric)) != ncol(to_deconv)){
+           to_deconv <- to_deconv[!duplicated(to_deconv[,1]), ]
+           bulkgene <-  to_deconv[,1]
+           to_deconv <- as.matrix(to_deconv[,-1])
+           rownames(to_deconv) <- bulkgene
+           rm(bulkgene)
+        }
      }
+      
+      
      if(input$chooseref == "custom"){
         metaref <- refdata() 
         # load reference data
         if(str_detect(input$ref$datapath,"csv")){
            ref <- read.csv(input$ref$datapath,
                            header = TRUE)
+           if(sum(sapply(ref, is.numeric)) != ncol(ref)){
+              ref <- ref[!duplicated(ref[,1]), ]
+              refgene <-  ref[,1]
+              ref <- as.matrix(ref[,-1])
+              rownames(ref) <- refgene
+           }
         }else if(str_detect(input$ref$datapath,"rds")){
            ref <- readRDS(input$ref$datapath)
-        }else if(str_detect(input$ref$datapath,"RData")){
-           ref <- load(input$ref$datapath)
+        }else if(str_detect(input$ref$datapath,"txt")){
+           ref <-  read.delim(input$ref$datapath)
+           if(sum(sapply(ref, is.numeric)) != ncol(ref)){
+              ref <- ref[!duplicated(ref[,1]), ]
+              refgene <-  ref[,1]
+              ref <- as.matrix(ref[,-1])
+              rownames(ref) <- refgene
+           }
         }
         
         refname <- input$columnsref
         colnames(metaref)[which(colnames(metaref) == refname)] = "deconv_clust" 
         refname <- input$columnssample
-        colnames(metaref)[which(colnames(metaref) == refname)] = "SamplesNames" 
+        colnames(metaref)[which(colnames(metaref) == refname)] = "SubjectName" 
      }else if(input$chooseref == "brain"){
         metaref <- readRDS(paste0("./data/meta_",input$localbrain,".rds"))
         ref <- readRDS(paste0("./data/ref_",input$localbrain,".rds"))
@@ -111,7 +139,11 @@ shinyServer(function(input, output,session){
         metaref <- readRDS(paste0("./data/meta_",input$localblood,".rds"))
         ref <- readRDS(paste0("./data/ref_",input$localblood,".rds"))
      }
-     
+      
+
+
+      
+     metaref$SamplesNames = colnames(ref)
      
      ref_list = list()
      ref_list$"ref" = list()

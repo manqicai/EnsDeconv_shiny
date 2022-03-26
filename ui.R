@@ -57,29 +57,29 @@ parameter_tabs <- tabsetPanel(
   type = "hidden",
   tabPanel("Select..."),
   tabPanel("custom",
-           fluidRow(column(width = 3,fileInput("ref", label = h4("Ref Data"),
+           fluidRow(column(width = 6,fileInput("ref", label = h4("Ref Data"),
                                                accept = c("text/csv",
                                                           "text/comma-separated-values,text/plain",
                                                           ".csv",
                                                           ".rds",
                                                           ".txt"))%>%
-                             helper(colour = "green",type = "inline",size = "m",content = "Upload the file of reference data (.csv, .rds or .RData),rows are genes and columns are samples")),
-                    column(width = 3,fileInput("metaref", label = h4("Meta data"),
+                             helper(colour = "green",type = "inline",size = "m",content = "Upload the file of reference data (.csv, .rds or .txt),rows are genes and columns are samples")),
+                    column(width = 6,fileInput("metaref", label = h4("Meta data"),
                                                accept = c("text/csv",
                                                           "text/comma-separated-values,text/plain",
                                                           ".csv",
                                                           ".rds",
                                                           ".txt"))%>%
-                             helper(colour = "green",type = "inline",size = "m",content = "Upload the file of meta data for the reference data (.csv, .rds or .RData)"))),
+                             helper(colour = "green",type = "inline",size = "m",content = "Upload the file of meta data for the reference data (.csv, .rds or .txt)"))),
            fluidRow(column(width = 6, selectInput("columnsref", h4("Select cluster variable"), choices = NULL)%>% helper(colour = "green",type = "inline", content = "Select the variable that correspond to cell type cluster")),
                      column(width = 6,selectInput("columnssample", h4("Select sample ID variable"), choices = NULL)%>% helper(colour = "green",type = "inline", content = "Select the variable that correspond to sample ID")))
   ),
   tabPanel("brain", 
-           selectInput("localbrain", label = h4("Choose brain reference data"),choices = list("Darmanis","Fan"))%>%
+           selectInput("localbrain", label = h4("Choose brain reference data"),choices = list("Darmanis","Habib"))%>%
              helper(colour = "green",type = "inline",size = "m",content = "Choose brain reference data")
   ),
   tabPanel("blood",
-           selectInput("localblood", label = h4("Choose blood reference data"),choices = list("lm22","Skin signatures"))%>%
+           selectInput("localblood", label = h4("Choose blood reference data"),choices = list("lm22","skin_signature"))%>%
              helper(colour = "green",type = "inline",size = "m",content = "Choose blood reference data")
   )
 )
@@ -160,7 +160,7 @@ tabPanel("Analysis",value = "dc",
 			                    #   parameter_tabs,
 			                    # ),
 			                    sidebarPanel(strong("Required"),
-			                                 fluidRow(column(width = 3,fileInput("bulk", label = h4("Bulk Data"),
+			                                 fluidRow(column(width = 6,fileInput("bulk", label = h4("Bulk Data"),
 			                                                                     accept = c("text/csv",
 			                                                                                "text/comma-separated-values,text/plain",
 			                                                                                ".csv",
@@ -168,20 +168,21 @@ tabPanel("Analysis",value = "dc",
 			                                                                                ".RData",
 			                                                                                ".txt"))
 			                                                 %>%
-			                                                   helper(colour = "green",type = "inline", content = "Upload the file of bulk data you want to deconvolve (.csv, .rds or .RData),rows are genes and columns are samples"))),
+			                                                   helper(colour = "green",type = "inline", content = "Upload the file of bulk data you want to deconvolve (.csv, .rds or .txt),rows are genes and columns are samples"))),
 			                                 
 			                                 fluidRow(column(width = 12,
 			                                                   selectInput("chooseref",h4("References"),
 			                                                               choices = c("Select...","Custom" = "custom", "local brain references"= "brain", "local blood references" = "blood")
-			                                                   ),
+			                                                   )%>%
+			                                                   helper(colour = "green",type = "inline", content = "Custom: upload customized references dataset; local brain (blood) references: select existing references"),
 			                                                   parameter_tabs))
 			                                 #actionButton("updateref", "incorporate external information", class = "btn-info"),
 			                                ,fluidRow(column(width = 6, multiInput("Deconv", label = h4("Deconvolution Method"),
-			                                                                       choices = list("dtangle", "hspe","DSA","CIBERSORT","EPIC","MuSiC","Bisque", "ICeDT","DeconRNASeq"),
+			                                                                       choices = list("dtangle", "hspe","DSA","CIBERSORT","EPIC","MuSiC","Bisque", "ICeDT","DeconRNASeq","FARDEEP","DCQ"),
 			                                                                       selected = c("Bisque","CIBERSORT"))
 			                                                 %>% helper(colour = "green",type = "inline", content = "Select the deconvolution methods that you want to apply")),
 			                                          column(width = 6,  multiInput("mrk", label = h4("Marker Gene Approach"),
-			                                                                        choices = list("none"  , "t","wilcox","combined","p.value"),
+			                                                                        choices = list("none"  , "t","wilcox","combined","p.value","regression"),
 			                                                                        selected = "none")
 			                                                 %>% helper(colour = "green",type = "inline", content = "Choose the marker gene selection methods that you want to apply"))),
 			                                 
@@ -211,28 +212,29 @@ tabPanel("Analysis",value = "dc",
 			                                                  helper(colour = "green",type = "inline",size = "m",content = "Choose the Normalization approach of bulk & reference data")))
 			                                 ,
 			                                 actionButton("dcupdate", "Run", class = "btn-info"),
-			                                 downloadButton("downloadData", "Download results"),
-			                                 hr(),
-			                                 strong("Selected"),
-			                                 switchInput(
-			                                   inputId = "case_ctrl",
-			                                   label = "Compare bulk data by case and control",
-			                                   onLabel = "Yes",
-			                                   offLabel = "No")%>%
-			                                   helper(colour = "green",type = "inline",size = "m",content = "Choose whether plot boxplot based on case and control"),
-			                                 fileInput("metabulk", label = h4("Meta Data for Bulk data"),
-			                                           accept = c("text/csv",
-			                                                      "text/comma-separated-values,text/plain",
-			                                                      ".csv",
-			                                                      ".rds",
-			                                                      ".RData"))
-			                                 %>%
-			                                   helper(colour = "green",type = "inline", content = "Upload the file of bulk data you want to deconvolve (.csv, .rds or .RData)"),
-			                                 actionButton("update", "incorporate external information", class = "btn-info"),
-			                                 selectInput("columns", h4("Select case control variable"), choices = NULL) %>%
-			                                   helper(colour = "green",type = "inline", content = "Select the case control indicator variable"),
-			                                 conditionalPanel(condition="$('html').hasClass('shiny-busy')",
-			                                                  tags$div("Loading...",id="loadmessage"))),
+			                                 downloadButton("downloadData", "Download results")
+			                                 # ,hr(),
+			                                 # strong("Selected"),
+			                                 # switchInput(
+			                                 #   inputId = "case_ctrl",
+			                                 #   label = "Compare bulk data by case and control",
+			                                 #   onLabel = "Yes",
+			                                 #   offLabel = "No")%>%
+			                                 #   helper(colour = "green",type = "inline",size = "m",content = "Choose whether plot boxplot based on case and control"),
+			                                 # fileInput("metabulk", label = h4("Meta Data for Bulk data"),
+			                                 #           accept = c("text/csv",
+			                                 #                      "text/comma-separated-values,text/plain",
+			                                 #                      ".csv",
+			                                 #                      ".rds",
+			                                 #                      ".RData"))
+			                                 # %>%
+			                                 #   helper(colour = "green",type = "inline", content = "Upload the file of bulk data you want to deconvolve (.csv, .rds or .txt)"),
+			                                 # actionButton("update", "incorporate external information", class = "btn-info"),
+			                                 # selectInput("columns", h4("Select case control variable"), choices = NULL) %>%
+			                                 #   helper(colour = "green",type = "inline", content = "Select the case control indicator variable"),
+			                                 # conditionalPanel(condition="$('html').hasClass('shiny-busy')",
+			                                 #                  tags$div("Loading...",id="loadmessage"))
+			                                ),
 			                    mainPanel(strong("Summary "),
 			                              p("DeconvolutionMethods_MarkerGeneSelection_Scale_Normalization: "),
 			                              #tableOutput("dctable")%>% withSpinner(),
