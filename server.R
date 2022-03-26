@@ -43,32 +43,40 @@ options(shiny.maxRequestSize=50000*1024^2)
 # source("pkg/DeconRNASeq.R")
 # source("pkg/hspe.R")
 shinyServer(function(input, output,session){
+   observeEvent(input$chooseref, {
+      updateTabsetPanel(inputId = "params", selected = input$chooseref)
+   })
    
+   
+
 ########### Update reference ###########
-   refdata <- reactive({
-      req(input$metaref)
-      if(str_detect(input$metaref$datapath,"csv")){
-         metaref <- read.csv(input$metaref$datapath,
-                              header = TRUE)
-      }else if(str_detect(input$metaref$datapath,"rds")){
-         metaref <- readRDS(input$metaref$datapath)
-      }else if(str_detect(input$metaref$datapath,"RData")){
-         metaref <- load(input$metaref$datapath)
-      }
-   })
+      refdata <- reactive({
+         req(input$metaref)
+         if(str_detect(input$metaref$datapath,"csv")){
+            metaref <- read.csv(input$metaref$datapath,
+                                header = TRUE)
+         }else if(str_detect(input$metaref$datapath,"rds")){
+            metaref <- readRDS(input$metaref$datapath)
+         }else if(str_detect(input$metaref$datapath,"RData")){
+            metaref <- load(input$metaref$datapath)
+         }
+      })
+      
+      
+      observeEvent(refdata(), {
+         updateSelectInput(session, "columnsref", choices=colnames(refdata()))
+         updateSelectInput(session, "columnssample", choices=colnames(refdata()))
+      })
    
    
-   observeEvent(refdata(), {
-      updateSelectInput(session, "columnsref", choices=colnames(refdata()))
-      updateSelectInput(session, "columnssample", choices=colnames(refdata()))
-   })
+   
+
    
 
 ###############CRM output################
 #########################################
   observe_helpers()
    dcInput <- eventReactive(input$dcupdate, {
-     nct <- input$numofct
 
      req(input$bulk)
      #load bulk data
@@ -80,62 +88,36 @@ shinyServer(function(input, output,session){
      }else if(str_detect(input$bulk$datapath,"RData")){
         load(input$bulk$datapath)
      }
-     metaref <- refdata() 
-     # load meta ref
-     # if(str_detect(input$metaref$datapath,"csv")){
-     #    metaref <- read.csv(input$metaref$datapath,
-     #                          header = TRUE)
-     # }else if(str_detect(input$metaref$datapath,"rds")){
-     #    metaref <- readRDS(input$metaref$datapath)
-     # }else if(str_detect(input$metaref$datapath,"RData")){
-     #    metaref <- load(input$metaref$datapath)
-     # }
-     # load reference data
-     if(str_detect(input$ref$datapath,"csv")){
-        ref <- read.csv(input$ref$datapath,
-                            header = TRUE)
-     }else if(str_detect(input$ref$datapath,"rds")){
-        ref <- readRDS(input$ref$datapath)
-     }else if(str_detect(input$ref$datapath,"RData")){
-        ref <- load(input$ref$datapath)
+     if(input$chooseref == "custom"){
+        metaref <- refdata() 
+        # load reference data
+        if(str_detect(input$ref$datapath,"csv")){
+           ref <- read.csv(input$ref$datapath,
+                           header = TRUE)
+        }else if(str_detect(input$ref$datapath,"rds")){
+           ref <- readRDS(input$ref$datapath)
+        }else if(str_detect(input$ref$datapath,"RData")){
+           ref <- load(input$ref$datapath)
+        }
+        
+        refname <- input$columnsref
+        colnames(metaref)[which(colnames(metaref) == refname)] = "deconv_clust" 
+        refname <- input$columnssample
+        colnames(metaref)[which(colnames(metaref) == refname)] = "SamplesNames" 
+     }else if(input$chooseref == "brain"){
+        metaref <- readRDS(paste0("./data/meta_",input$localbrain,".rds"))
+        ref <- readRDS(paste0("./data/ref_",input$localbrain,".rds"))
+     }else{
+        metaref <- readRDS(paste0("./data/meta_",input$localblood,".rds"))
+        ref <- readRDS(paste0("./data/ref_",input$localblood,".rds"))
      }
-
-     #gene <- intersect(rownames(to_deconv), rownames(ref))
-     #to_deconv <- to_deconv[gene,]
-     #ref <- ref[pmatch(gene,rownames(ref)),]
-     #to_deconv <- as.matrix(to_deconv)
-     #ref<- as.matrix(ref)
-     
-     # scaling
-     # to_deconv <- Normalization(to_deconv,input$norm)
-     # ref <- Normalization(ref,input$norm)
-     # 
-     # 
-     # # Scaling
-     # if(input$scale == "log"){
-     #    to_deconv = log2(to_deconv+1)
-     #    if(class(ref)[[1]] == "dgCMatrix"){
-     #       ref@x <- log2(ref@x + 1)
-     #    }else{
-     #       ref <- log2(ref+1)
-     #    }
-     # }
-      
-     bat <- ifelse(input$batchcorrec == "Yes",TRUE,FALSE)
-     
-     refname <- input$columnsref
-     colnames(metaref)[which(colnames(metaref) == refname)] = "deconv_clust" 
-     refname <- input$columnssample
-     colnames(metaref)[which(colnames(metaref) == refname)] = "SamplesNames" 
      
      
      ref_list = list()
      ref_list$"ref" = list()
      ref_list$"ref"$ref_matrix = as.matrix(ref)
      ref_list$"ref"$meta_ref = metaref
-     
-     res <- list()
-     #res[[paste0(mth,"_",mrk_method,"_",input$scale,"_",input$norm)]] <- run_deconv_method(method_name = mth, to_deconv = as.matrix(to_deconv),ref_matrix= ref,meta_ref = metaref, markers,data_type = datatype,marker_method = mrk_method,batchcorrec = bat,scale = input$scale,nmrks = input$nmrk,deconv_clust = input$columnsref,samplesname = input$columnssample)
+
      params = get_params(data_type = input$datatype, data_name = "ref", n_markers = input$nmrk,Marker.Method = input$mrk,TNormalization = input$norm,CNormalization =input$norm ,dmeths = input$Deconv,Scale = input$scale)
      #params
      res <- EnsDeconv(count_bulk = as.matrix(to_deconv), ref_list = ref_list, ncore = 4, parallel_comp = F, params = params)
