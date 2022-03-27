@@ -6,7 +6,7 @@
 #
 #    http://shiny.rstudio.com/
 #
-
+devtools::install_github("randel/EnsDeconv", dependencies = TRUE)
 ########Library Packages#
 
 #options(repos = BiocManager::repositories())
