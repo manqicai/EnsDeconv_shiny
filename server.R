@@ -47,6 +47,10 @@ shinyServer(function(input, output,session){
       updateTabsetPanel(inputId = "params", selected = input$chooseref)
    })
    
+   observeEvent(input$choosepara, {
+      updateTabsetPanel(inputId = "para_params", selected = input$choosepara)
+   })
+   
    
 
 ########### Update reference ###########
@@ -152,7 +156,13 @@ shinyServer(function(input, output,session){
 
      params = get_params(data_type = input$datatype, data_name = "ref", n_markers = input$nmrk,Marker.Method = input$mrk,TNormalization = input$norm,CNormalization =input$norm ,dmeths = input$Deconv,Scale = input$scale)
      #params
-     res <- EnsDeconv(count_bulk = as.matrix(to_deconv), ref_list = ref_list, ncore = 4, parallel_comp = F, params = params)
+     if(input$choosepara == "FALSE"){
+        res <- EnsDeconv(count_bulk = as.matrix(to_deconv), ref_list = ref_list, ncore = 4, parallel_comp = F, params = params)
+     }else{
+        res <- EnsDeconv(count_bulk = as.matrix(to_deconv), ref_list = ref_list, ncore = input$ncore, parallel_comp = T, params = params)
+     }
+     
+     
      res_p = lapply(res[[2]], function(x) x[["a"]][["p_hat"]][[1]][[1]])
      res_p[["Ensemble"]] = res[["EnsDeconv"]][["ensemble_p"]]
 

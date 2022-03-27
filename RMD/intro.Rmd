@@ -12,7 +12,7 @@ Cell type fractions have been shown useful in many genomics analyses. Traditiona
 
 We introduce EnsDeconv (Ensemble Deconvolution), which uses ensemble learning to to robustly estimate cellular fractions from bulk omics data.
 
-<img src="../figs/EnsDeconv_alg.png" width="1000">
+<img src="../figs/EnsDeconv_algorithm.png" width="700">
 
 ---
 

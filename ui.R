@@ -71,7 +71,7 @@ parameter_tabs <- tabsetPanel(
                                                           ".rds",
                                                           ".txt"))%>%
                              helper(colour = "green",type = "inline",size = "m",content = "Upload the file of meta data for the reference data (.csv, .rds or .txt)"))),
-           fluidRow(column(width = 6, selectInput("columnsref", h4("Select cluster variable"), choices = NULL)%>% helper(colour = "green",type = "inline", content = "Select the variable that correspond to cell type cluster")),
+           fluidRow(column(width = 6, selectInput("columnsref", h4("Select cell type variable"), choices = NULL)%>% helper(colour = "green",type = "inline", content = "Select the variable that correspond to cell type cluster")),
                      column(width = 6,selectInput("columnssample", h4("Select sample ID variable"), choices = NULL)%>% helper(colour = "green",type = "inline", content = "Select the variable that correspond to sample ID")))
   ),
   tabPanel("brain", 
@@ -83,6 +83,17 @@ parameter_tabs <- tabsetPanel(
              helper(colour = "green",type = "inline",size = "m",content = "Choose blood reference data")
   )
 )
+
+
+parallel_parameter_tabs <- tabsetPanel(
+  id = "para_params",
+  type = "hidden",
+  tabPanel("FALSE"),
+  tabPanel("TRUE",
+           fluidRow(fluidRow(column(width = 12,numericInput("ncore", label = h4("Num. of cores"),value = 2)
+                                    %>% helper(colour = "green",type = "inline", content = "The number of cores to use for parallel execution"))
+  ))
+))
 
 
 navbarPage(title = div("EnsDeconv (Ensemble Deconvolution)",tagList(a(href = "https://publichealth.pitt.edu/biostatistics/", style = "color:#606060", tags$img(src='University_of_Pittsburgh_Logo_CMYK_Primary_3-Color.png',height = 30,width =60)))),
@@ -172,9 +183,9 @@ tabPanel("Analysis",value = "dc",
 			                                 
 			                                 fluidRow(column(width = 12,
 			                                                   selectInput("chooseref",h4("References"),
-			                                                               choices = c("Select...","Custom" = "custom", "local brain references"= "brain", "local blood references" = "blood")
+			                                                               choices = c("Select...","Custom" = "custom", "brain references"= "brain", "blood references" = "blood")
 			                                                   )%>%
-			                                                   helper(colour = "green",type = "inline", content = "Custom: upload customized references dataset; local brain (blood) references: select existing references"),
+			                                                   helper(colour = "green",type = "inline", content = "Custom: upload customized references dataset; brain (blood) references: select existing references"),
 			                                                   parameter_tabs))
 			                                 #actionButton("updateref", "incorporate external information", class = "btn-info"),
 			                                ,fluidRow(column(width = 6, multiInput("Deconv", label = h4("Deconvolution Method"),
@@ -210,7 +221,14 @@ tabPanel("Analysis",value = "dc",
 			                                                                                             lib = "glyphicon")),
 			                                                                                 selected = "none")%>%
 			                                                  helper(colour = "green",type = "inline",size = "m",content = "Choose the Normalization approach of bulk & reference data")))
-			                                 ,
+			                                 ,fluidRow(column(width = 12,
+			                                                  selectInput("choosepara",h4("Parallel Computing"),
+			                                                              choices = c("False"= "FALSE","True" = "TRUE")
+			                                                  )%>%
+			                                                    helper(colour = "green",type = "inline", content = "Use parallel computing or not"),
+			                                                  parallel_parameter_tabs))
+			                                #actionButton("updateref", "incorporate external information", class = "btn-info"),
+			                                ,
 			                                 actionButton("dcupdate", "Run", class = "btn-info"),
 			                                 downloadButton("downloadData", "Download results")
 			                                 # ,hr(),
