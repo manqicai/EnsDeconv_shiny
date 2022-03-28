@@ -6,7 +6,7 @@
 #
 #    http://shiny.rstudio.com/
 #
-devtools::install_github("randel/EnsDeconv", dependencies = TRUE)
+#devtools::install_github("randel/EnsDeconv", dependencies = TRUE)
 ########Library Packages#
 
 #options(repos = BiocManager::repositories())
@@ -90,9 +90,9 @@ parallel_parameter_tabs <- tabsetPanel(
   type = "hidden",
   tabPanel("FALSE"),
   tabPanel("TRUE",
-           fluidRow(fluidRow(column(width = 12,numericInput("ncore", label = h4("Num. of cores"),value = 2)
+           fluidRow(column(width = 12,numericInput("ncore", label = h4("Num. of cores"),value = 2)
                                     %>% helper(colour = "green",type = "inline", content = "The number of cores to use for parallel execution"))
-  ))
+  )
 ))
 
 

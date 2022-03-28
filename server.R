@@ -155,21 +155,41 @@ shinyServer(function(input, output,session){
      ref_list$"ref"$meta_ref = metaref
 
      params = get_params(data_type = input$datatype, data_name = "ref", n_markers = input$nmrk,Marker.Method = input$mrk,TNormalization = input$norm,CNormalization =input$norm ,dmeths = input$Deconv,Scale = input$scale)
-     #params
-     if(input$choosepara == "FALSE"){
-        res <- EnsDeconv(count_bulk = as.matrix(to_deconv), ref_list = ref_list, ncore = 4, parallel_comp = F, params = params)
+     
+     if(nrow(params)>1){
+        #params
+        if(input$choosepara == "FALSE"){
+           res <- EnsDeconv(count_bulk = as.matrix(to_deconv), ref_list = ref_list, ncore = 4, parallel_comp = F, params = params)
+        }else{
+           res <- EnsDeconv(count_bulk = as.matrix(to_deconv), ref_list = ref_list, ncore = input$ncore, parallel_comp = T, params = params)
+        }
+        
+        
+        res_p = lapply(res[[2]], function(x) x[["a"]][["p_hat"]][[1]][[1]])
+        res_p[["Ensemble"]] = res[["EnsDeconv"]][["ensemble_p"]]
+        
+        #res_new <- list(res_p = res_p, case_ctrl = input$case_ctrl)
+        #outt = lapply(res, function(x) x[["estimate"]])
+        res_p[sapply(res_p, is.null)] <- NULL
+        res_p
      }else{
-        res <- EnsDeconv(count_bulk = as.matrix(to_deconv), ref_list = ref_list, ncore = input$ncore, parallel_comp = T, params = params)
+        if(input$choosepara == "FALSE"){
+           
+           res <- gen_all_res_list(count_bulk = as.matrix(to_deconv), meta_bulk = NULL, ref_list = ref_list, true_frac =NULL, outpath =NULL, ncore =4, parallel_comp = F, params = params)
+
+           }else{
+              res <- gen_all_res_list(count_bulk = as.matrix(to_deconv), meta_bulk = NULL, ref_list = ref_list, true_frac =NULL, outpath =NULL, ncore =input$ncore, parallel_comp = T, params = params)
+           }
+        ind = sapply(res, function(x){
+           length(x[["a"]][["p_hat"]][[1]])
+        })
+        res = res[which(ind == 1)]
+        res_p = lapply(res, function(x) x[["a"]][["p_hat"]][[1]][[1]])
+        res_p[sapply(res_p, is.null)] <- NULL
+        res_p
      }
      
-     
-     res_p = lapply(res[[2]], function(x) x[["a"]][["p_hat"]][[1]][[1]])
-     res_p[["Ensemble"]] = res[["EnsDeconv"]][["ensemble_p"]]
 
-     res_new <- list(res_p = res_p, case_ctrl = input$case_ctrl)
-     #outt = lapply(res, function(x) x[["estimate"]])
-     res_p[sapply(res_p, is.null)] <- NULL
-     res_p
      })
 
    
