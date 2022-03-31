@@ -34,6 +34,7 @@ library(formattable)
 library(shinysky)
 library(shinycssloaders)
 library(shinyWidgets)
+library(edgeR)
 
 
 
@@ -194,7 +195,7 @@ tabPanel("Analysis",value = "dc",
 			                                                 %>% helper(colour = "green",type = "inline", content = "Select the deconvolution methods that you want to apply")),
 			                                          column(width = 6,  multiInput("mrk", label = h4("Marker Gene Approach"),
 			                                                                        choices = list("none"  , "t","wilcox","combined","p.value","regression"),
-			                                                                        selected = "none")
+			                                                                        selected = "t")
 			                                                 %>% helper(colour = "green",type = "inline", content = "Choose the marker gene selection methods that you want to apply"))),
 			                                 
 			                                
@@ -254,7 +255,7 @@ tabPanel("Analysis",value = "dc",
 			                                 #                  tags$div("Loading...",id="loadmessage"))
 			                                ),
 			                    mainPanel(strong("Summary "),
-			                              p("DeconvolutionMethods_MarkerGeneSelection_Scale_Normalization: "),
+			                              #p("DeconvolutionMethods_MarkerGeneSelection_Scale_Normalization: "),
 			                              #tableOutput("dctable")%>% withSpinner(),
 			                              # uiOutput("plots") %>% withSpinner(),
 			                              plotOutput("plots") %>% withSpinner(),
