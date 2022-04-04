@@ -107,7 +107,7 @@ shinyServer(function(input, output,session){
         }
      }
       
-      
+    
      if(input$chooseref == "custom"){
         metaref <- refdata() 
         # load reference data
@@ -139,12 +139,36 @@ shinyServer(function(input, output,session){
      }else if(input$chooseref == "brain"){
         metaref <- readRDS(paste0("./data/meta_",input$localbrain,".rds"))
         ref <- readRDS(paste0("./data/ref_",input$localbrain,".rds"))
+        
+        # Detect whether bulk data contains gene name or Ensembl gene IDs
+        if(sum(unique(sapply(rownames(to_deconv), str_length)) != 15) !=0){
+          library(biomaRt)
+          mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
+          gene_IDs <- getBM(filters= "ensembl_gene_id", attributes= c("ensembl_gene_id","hgnc_symbol"),
+                            values = rownames(ref), mart= mart)
+          gene_IDs = gene_IDs %>% filter(hgnc_symbol!="")
+          
+          ref = ref[gene_IDs$ensembl_gene_id,]
+          rownames(ref) = gene_IDs$hgnc_symbol
+        }
+        
      }else{
         metaref <- readRDS(paste0("./data/meta_",input$localblood,".rds"))
         ref <- readRDS(paste0("./data/ref_",input$localblood,".rds"))
+        # Detect whether bulk data contains gene name or Ensembl gene IDs
+        if(sum(unique(sapply(rownames(to_deconv), str_length)) != 15) !=0){
+          library(biomaRt)
+          mart <- useDataset("hsapiens_gene_ensembl", useMart("ensembl"))
+          gene_IDs <- getBM(filters= "ensembl_gene_id", attributes= c("ensembl_gene_id","hgnc_symbol"),
+                            values = rownames(ref), mart= mart)
+          gene_IDs = gene_IDs %>% filter(hgnc_symbol!="")
+          
+          ref = ref[gene_IDs$ensembl_gene_id,]
+          rownames(ref) = gene_IDs$hgnc_symbol
+        }
      }
       
-
+  
 
       
      metaref$SamplesNames = colnames(ref)
