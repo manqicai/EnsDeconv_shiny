@@ -183,7 +183,7 @@ shinyServer(function(input, output,session){
      if(nrow(params)>1){
         #params
         if(input$choosepara == "FALSE"){
-           res <- EnsDeconv(count_bulk = as.matrix(to_deconv), ref_list = ref_list, ncore = 4, parallel_comp = F, params = params)
+           res <- EnsDeconv(count_bulk = as.matrix(to_deconv), ref_list = ref_list, ncore = 4, parallel_comp = F, params = params,inrshiny = T)
         }else{
            res <- EnsDeconv(count_bulk = as.matrix(to_deconv), ref_list = ref_list, ncore = input$ncore, parallel_comp = T, params = params)
         }
@@ -199,7 +199,7 @@ shinyServer(function(input, output,session){
      }else{
         if(input$choosepara == "FALSE"){
            
-           res <- gen_all_res_list(count_bulk = as.matrix(to_deconv), meta_bulk = NULL, ref_list = ref_list, true_frac =NULL, outpath =NULL, ncore =4, parallel_comp = F, params = params)
+           res <- gen_all_res_list_rshiny(count_bulk = as.matrix(to_deconv), meta_bulk = NULL, ref_list = ref_list, true_frac =NULL, outpath =NULL, ncore =4, parallel_comp = F, params = params)
 
            }else{
               res <- gen_all_res_list(count_bulk = as.matrix(to_deconv), meta_bulk = NULL, ref_list = ref_list, true_frac =NULL, outpath =NULL, ncore =input$ncore, parallel_comp = T, params = params)
